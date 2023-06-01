@@ -17,6 +17,10 @@ from schemas import ReviewResponseModel
 from schemas import MovieRequestModel
 from schemas import MovieResponseModel
 
+from typing import List
+
+from schemas import ReviewRequestPutModel
+
 # uvicorn main:app --reload -> levantar servidor --reload es como nodemon
 
 app = FastAPI(title = 'Proyecto para reseñar peliculas',
@@ -112,5 +116,65 @@ async def create_movie(movie: MovieRequestModel):
     )
 
     return movie
+
+
+
+
+# ----------- obtener reseñas ------------
+
+@app.get('/reviews', response_model = List[ReviewResponseModel])
+async def get_reviews():
+    reviews = UserReview.select() # SELECT * FROM user_reviews
+
+    return [ user_review for user_review in reviews ]
+
+
+# obtener una sola reseña
+@app.get('/reviews/{id}', response_model = ReviewResponseModel)
+async def get_review(id: int):
+    review = UserReview.select().where(UserReview.id == id).first()
+
+    if review is None:
+        raise HTTPException(status_code = 404, detail = 'Review not found')
+
+    return review
+
+
+# actualizar reseña
+
+@app.put('/reviews/{id}', response_model =  ReviewResponseModel)
+async def update_review(id: int, review_request: ReviewRequestPutModel):
+    review = UserReview.select().where(UserReview.id == id).first()
+
+    # no existe
+    if review is None:
+        raise HTTPException(status_code = 404, detail = 'Review not found')
+
+    # si existe
+    review.reviews = review_request.reviews
+    review.score = review_request.score
+
+    review.save()
+
+    return review
+
+
+# eliminar reseña
+
+@app.delete('/reviews/{id}', response_model = ReviewResponseModel)
+async def delete_review(id: int):
+    review = UserReview.select().where(UserReview.id == id).first()
+
+    # no existe
+    if review is None:
+        raise HTTPException(status_code = 404, detail = 'Review not found')
+
+    # si existe
+    review.delete_instance() # de peewee
+    
+    return review
+
+
+
 
 

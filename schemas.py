@@ -55,17 +55,26 @@ class UserResponseModel(BaseModel):
 
 # --------------- reseña ---------------
 
-class ReviewRequestModel(BaseModel):
+
+# ----- validador de score -----
+class ReviewValidator():
+
+    @validator('score')
+    def score_validator(cls, score):
+        if score < 1 or score > 10:
+            raise ValueError('La longitud de score debe ser >= 1 o <= 10')
+
+        return score
+
+
+class ReviewRequestModel(BaseModel, ReviewValidator):
     # datos obligatorios
     user_id: int
     movie_id: int
     reviews: str
     score: int
 
-    @validator('score')
-    def score_validator(cls, score):
-        if score < 1 or score > 10:
-            raise ValueError('La longitud de score debe ser >= 1 o <= 10')
+    
 
 class ReviewResponseModel(BaseModel):
     id: int
@@ -78,6 +87,8 @@ class ReviewResponseModel(BaseModel):
     class Config:
         orm_mode = True
         getter_dict = PeeweeGetterDict
+
+
 
 
 # --------------- movie ---------------
@@ -93,4 +104,14 @@ class MovieResponseModel(BaseModel):
     class Config:
         orm_mode = True
         getter_dict = PeeweeGetterDict
+
+
+
+# validar datos de entrada para actualizar una reseña
+class ReviewRequestPutModel(BaseModel, ReviewValidator):
+    reviews: str
+    score: int
+
+    
+    
 
