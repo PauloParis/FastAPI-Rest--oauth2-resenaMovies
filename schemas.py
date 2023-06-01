@@ -13,6 +13,9 @@ from typing import Any
 
 from peewee import ModelSelect
 
+
+# --------------- usuario ---------------
+
 # convertir objeto a diccionario
 class PeeweeGetterDict(GetterDict):
     def get(self, key: Any, default: Any = None):
@@ -43,6 +46,51 @@ class UserResponseModel(BaseModel):
     username: str
 
 
+    # serializar el objeto de tipo model
     class Config:
         orm_mode = True
         getter_dict = PeeweeGetterDict
+
+
+
+# --------------- reseña ---------------
+
+class ReviewRequestModel(BaseModel):
+    # datos obligatorios
+    user_id: int
+    movie_id: int
+    reviews: str
+    score: int
+
+    @validator('score')
+    def score_validator(cls, score):
+        if score < 1 or score > 10:
+            raise ValueError('La longitud de score debe ser >= 1 o <= 10')
+
+class ReviewResponseModel(BaseModel):
+    id: int
+    movie_id: int
+    reviews: str
+    score: int
+
+
+    # serializar el objeto de tipo model
+    class Config:
+        orm_mode = True
+        getter_dict = PeeweeGetterDict
+
+
+# --------------- movie ---------------
+
+class MovieRequestModel(BaseModel):
+    title: str
+
+class MovieResponseModel(BaseModel):
+    id: int
+    title: str
+    
+    # serializar el objeto de tipo model
+    class Config:
+        orm_mode = True
+        getter_dict = PeeweeGetterDict
+

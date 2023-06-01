@@ -11,6 +11,11 @@ from database import database as connection
 from schemas import UserRequestModel
 from schemas import UserResponseModel
 
+from schemas import ReviewRequestModel
+from schemas import ReviewResponseModel
+
+from schemas import MovieRequestModel
+from schemas import MovieResponseModel
 
 # uvicorn main:app --reload -> levantar servidor --reload es como nodemon
 
@@ -70,4 +75,42 @@ async def create_user(user: UserRequestModel):
 
     #return UserResponseModel(id = user.id, username = user.username)
     return user  # se usa PeeweeGetterDict
+
+
+
+# ---------- Crear Reseña --------------
+
+@app.post('/reviews', response_model = ReviewResponseModel)
+async def create_reviews(user_review: ReviewRequestModel):
+
+    # validando si existe el usuario
+    if User.select().where(User.id == user_review.user_id).first() is None:
+        raise HTTPException(status_code = 404, detail = 'User not found')
+    
+    # validando si existe la pelicula
+    if Movie.select().where(Movie.id == user_review.movie_id).first() is None:
+        raise HTTPException(status_code = 404, detail = 'Movie not found')
+    
+    
+    user_review = UserReview.create(
+        user_id = user_review.user_id,
+        movie_id = user_review.movie_id,
+        reviews = user_review.reviews,
+        score = user_review.score
+    )
+
+    return user_review
+
+
+# ---------- Crear Movie --------------
+
+@app.post('/movie', response_model = MovieResponseModel)
+async def create_movie(movie: MovieRequestModel):
+
+    movie = Movie.create(
+        title = movie.title
+    )
+
+    return movie
+
 
