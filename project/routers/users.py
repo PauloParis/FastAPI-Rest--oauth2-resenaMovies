@@ -18,6 +18,11 @@ from typing import List
 from ..schemas import ReviewResponseModel
 
 
+from fastapi import Depends
+from ..common import oauth_schema
+from ..common import get_current_user
+
+
 router = APIRouter(prefix='/users')
 
 
@@ -63,8 +68,8 @@ async def login(credentials: HTTPBasicCredentials, response: Response):
     return user
 
 
-# traer las review de un user autenticado
-@router.get('/reviews', response_model = List[ReviewResponseModel])
+# traer las review de un user autenticado - cookie
+""" @router.get('/reviews', response_model = List[ReviewResponseModel])
 async def get_reviews(user_id: int = Cookie(None)): 
     
     user = User.select().where(User.id == user_id).first()
@@ -74,6 +79,20 @@ async def get_reviews(user_id: int = Cookie(None)):
     
     return [ user_review for user_review in user.reviews ]
 
+ """
 
 
+# traer las review de un user autenticado - jwt
+@router.get('/reviews',  response_model = List[ReviewResponseModel])
+async def get_reviews(user: User = Depends(get_current_user)):  # token: str = Depends(oauth_schema) -> antiguo
+    
+    """ return {
+        'token': token
+    } -> antiguo """
 
+    """ return {
+        'id': user.id,
+        'username': user.username
+    } """
+
+    return [ user_review for user_review in user.reviews ]

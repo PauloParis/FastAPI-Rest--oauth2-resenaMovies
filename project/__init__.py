@@ -14,6 +14,13 @@ from .routers import movie_router
 from .routers import review_router
 
 
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
+
+
+from .common import create_access_token
 
 # uvicorn main:app --reload -> levantar servidor --reload es como nodemon
 
@@ -28,7 +35,33 @@ api_v1.include_router(user_router)
 api_v1.include_router(movie_router)
 api_v1.include_router(review_router)
 
+
+
+
+# ------------ OAUTH 2 ---------------
+
+@api_v1.post('/auth')
+async def auth(data: OAuth2PasswordRequestForm = Depends()):
+    
+    user = User.authenticate(data.username, data.password)
+    if user:
+        return {
+            'access_token': create_access_token(user),
+            'token_type': 'Bearer'
+        }
+    else:
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail = 'Username o Password incorrecto',
+            headers = { 'WWWW-Autenticate': 'Bearer' }
+        )
+
+
+
+#--------------------------
 app.include_router(api_v1)
+#--------------------------
+
 
 # -------------- Rutas -------------
 

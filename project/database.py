@@ -36,6 +36,16 @@ class User(Model):
     
 
 
+    # OAUTH
+    @classmethod
+    def authenticate(cls, username, password):
+        user = cls.select().where(User.username == username).first()
+
+        if user and user.password == cls.create_password(password):
+            return user
+
+
+
 class Movie(Model):
     # atributos
     title = CharField(max_length=50)

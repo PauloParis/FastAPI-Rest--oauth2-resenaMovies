@@ -87,7 +87,7 @@ class ReviewValidator():
 
 class ReviewRequestModel(BaseModel, ReviewValidator):
     # datos obligatorios
-    user_id: int
+    #user_id: int -> ahora el user se conoce con la autencicación
     movie_id: int
     reviews: str
     score: int
