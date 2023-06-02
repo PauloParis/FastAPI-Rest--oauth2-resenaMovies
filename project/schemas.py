@@ -53,6 +53,24 @@ class UserResponseModel(BaseModel):
 
 
 
+
+# --------------- movie ---------------
+
+class MovieRequestModel(BaseModel):
+    title: str
+
+class MovieResponseModel(BaseModel):
+    id: int
+    title: str
+    
+    # serializar el objeto de tipo model
+    class Config:
+        orm_mode = True
+        getter_dict = PeeweeGetterDict
+
+
+
+
 # --------------- reseña ---------------
 
 
@@ -78,7 +96,8 @@ class ReviewRequestModel(BaseModel, ReviewValidator):
 
 class ReviewResponseModel(BaseModel):
     id: int
-    movie_id: int
+    #movie_id: int
+    movie: MovieResponseModel
     reviews: str
     score: int
 
@@ -90,20 +109,6 @@ class ReviewResponseModel(BaseModel):
 
 
 
-
-# --------------- movie ---------------
-
-class MovieRequestModel(BaseModel):
-    title: str
-
-class MovieResponseModel(BaseModel):
-    id: int
-    title: str
-    
-    # serializar el objeto de tipo model
-    class Config:
-        orm_mode = True
-        getter_dict = PeeweeGetterDict
 
 
 
